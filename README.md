@@ -181,3 +181,48 @@ npm run preview
 ## 🎓 Academic Roadmap vs Browser Implementation Note
 
 The project roadmap references **LEX/FLEX** and **YACC/BISON** for native C/C++ backend compilation. The current application is a fully functional, browser-based TypeScript prototype with separated modules that can interface directly with a Flex/Bison WebAssembly or native C/C++ backend through clean API boundaries.
+
+
+---
+
+## ⚙️ Native Compiler Backend (LEX/FLEX & YACC/BISON)
+
+In addition to the interactive browser-based TypeScript studio, the repository provides the production **Flex** (`lexer.l`) and **Bison** (`parser.y`) specifications representing the formal compiler frontend.
+
+### Files
+* **[`lexer.l`](file:///c:/Users/heman/LISP_PARSER/lexer.l)**: Lexical analyzer scanning tokens (`LPAREN`, `RPAREN`, `NUMBER`, `STRING`, `SYMBOL`, `QUOTE`, `DOT`), handling escapes (`\n`, `\t`, `\"`, `\\`), nested `#| ... |#` block comments, and tracking 1-based line/col numbers.
+* **[`parser.y`](file:///c:/Users/heman/LISP_PARSER/parser.y)**: LALR(1) Context-Free Grammar for LISP expressions, building a complete C AST (`Program`, `List`, `DottedList`, `Symbol`, `Number`, `String`, `Quote`, `Error`), panic-mode error recovery, hierarchical tree visualization, and JSON serialization.
+* **[`Makefile`](file:///c:/Users/heman/LISP_PARSER/Makefile)**: Standard build script for Linux/macOS/WSL/MinGW.
+* **[`build.bat`](file:///c:/Users/heman/LISP_PARSER/build.bat)**: Automated build batch file for Windows.
+* **[`sample.lisp`](file:///c:/Users/heman/LISP_PARSER/sample.lisp)**: Comprehensive test suite with functions, nested lists, quotes, and strings.
+* **[`sample_invalid.lisp`](file:///c:/Users/heman/LISP_PARSER/sample_invalid.lisp)**: Error recovery test case.
+
+### Compilation Instructions
+
+#### On Linux / macOS / WSL:
+```bash
+# Compile with make
+make
+
+# Or run commands manually:
+bison -d parser.y
+flex lexer.l
+gcc -Wall -Wextra -O2 -o lisp_parser parser.tab.c lex.yy.c
+
+# Run tests
+./lisp_parser --all sample.lisp
+./lisp_parser sample_invalid.lisp
+```
+
+#### On Windows (with MinGW / win_flex_bison):
+```cmd
+build.bat
+lisp_parser.exe --all sample.lisp
+```
+
+#### CLI Options:
+* `--tree`: Print hierarchical ASCII/Unicode AST tree (default)
+* `--ascii`: Use ASCII branch symbols (`+--`, `|  `, `\--`)
+* `--json`: Print JSON serialization of AST (compatible with the UI)
+* `--stats`: Print compiler metrics (total nodes, depth, lists, atoms, error recoveries)
+* `--all`: Print tree, JSON, and statistics together
